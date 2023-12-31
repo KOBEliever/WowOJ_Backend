@@ -1,13 +1,20 @@
 package com.dy.wowoj.service;
 
+import com.dy.wowoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.dy.wowoj.model.entity.QuestionSubmit;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dy.wowoj.model.entity.User;
 
 /**
 * @author dingyi
-* @description 针对表【question_submit(题目提交)】的数据库操作Service
-* @createDate 2023-12-30 17:24:41
 */
 public interface QuestionSubmitService extends IService<QuestionSubmit> {
+    /**
+     * 题目提交
+     * @param questionSubmitAddRequest
+     * @param loginUser
+     * @return
+     */
+    long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser);
 
 }
