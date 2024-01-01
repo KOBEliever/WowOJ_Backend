@@ -9,10 +9,7 @@ import com.dy.wowoj.common.ResultUtils;
 import com.dy.wowoj.constant.UserConstant;
 import com.dy.wowoj.exception.BusinessException;
 import com.dy.wowoj.exception.ThrowUtils;
-import com.dy.wowoj.model.dto.question.QuestionAddRequest;
-import com.dy.wowoj.model.dto.question.QuestionEditRequest;
-import com.dy.wowoj.model.dto.question.QuestionQueryRequest;
-import com.dy.wowoj.model.dto.question.QuestionUpdateRequest;
+import com.dy.wowoj.model.dto.question.*;
 import com.dy.wowoj.model.entity.Question;
 import com.dy.wowoj.model.entity.User;
 import com.dy.wowoj.model.vo.QuestionVO;
@@ -62,6 +59,14 @@ public class QuestionController {
         List<String> tags = questionAddRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCases = questionAddRequest.getJudgeCase();
+        if (judgeCases != null) {
+            question.setJudgeCase(GSON.toJson(judgeCases));
+        }
+        JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
+        if (judgeConfig != null) {
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         questionService.validQuestion(question, true);
         User loginUser = userService.getLoginUser(request);
@@ -116,6 +121,14 @@ public class QuestionController {
         List<String> tags = questionUpdateRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCases = questionUpdateRequest.getJudgeCase();
+        if (judgeCases != null) {
+            question.setJudgeCase(GSON.toJson(judgeCases));
+        }
+        JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
+        if (judgeConfig != null) {
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
@@ -191,7 +204,7 @@ public class QuestionController {
     // endregion
 
     /**
-     * 分页搜索（从 ES 查询，封装类）
+     * 分页搜索
      *
      * @param questionQueryRequest
      * @param request
@@ -225,6 +238,14 @@ public class QuestionController {
         List<String> tags = questionEditRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCases = questionEditRequest.getJudgeCase();
+        if (judgeCases != null) {
+            question.setJudgeCase(GSON.toJson(judgeCases));
+        }
+        JudgeConfig judgeConfig = questionEditRequest.getJudgeConfig();
+        if (judgeConfig != null) {
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);

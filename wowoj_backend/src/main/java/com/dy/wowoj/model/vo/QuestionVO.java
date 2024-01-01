@@ -11,6 +11,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,7 +22,6 @@ public class QuestionVO implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -35,7 +35,7 @@ public class QuestionVO implements Serializable {
     private String content;
 
     /**
-     * 标签列表（json 数组）
+     * 标签列表
      */
     private List<String> tags;
 
@@ -50,7 +50,7 @@ public class QuestionVO implements Serializable {
     private Integer acceptedNum;
 
     /**
-     * 判题配置(json)
+     * 判题配置（json 对象）
      */
     private JudgeConfig judgeConfig;
 
@@ -65,11 +65,24 @@ public class QuestionVO implements Serializable {
     private Integer favourNum;
 
     /**
-     * 创建用户
+     * 创建用户 id
+     */
+    private Long userId;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 创建题目人的信息
      */
     private UserVO userVO;
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 包装类转对象
@@ -87,9 +100,9 @@ public class QuestionVO implements Serializable {
         if (tagList != null) {
             question.setTags(JSONUtil.toJsonStr(tagList));
         }
-        JudgeConfig judgeConfigVO = questionVO.getJudgeConfig();
-        if(judgeConfigVO != null){
-            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfigVO));
+        JudgeConfig voJudgeConfig = questionVO.getJudgeConfig();
+        if (voJudgeConfig != null) {
+            question.setJudgeConfig(JSONUtil.toJsonStr(voJudgeConfig));
         }
         return question;
     }
@@ -106,8 +119,12 @@ public class QuestionVO implements Serializable {
         }
         QuestionVO questionVO = new QuestionVO();
         BeanUtils.copyProperties(question, questionVO);
-        questionVO.setTags(JSONUtil.toList(question.getTags(), String.class));
-        questionVO.setJudgeConfig(JSONUtil.toBean(question.getJudgeConfig(),JudgeConfig.class));
+        List<String> tagList = JSONUtil.toList(question.getTags(), String.class);
+        questionVO.setTags(tagList);
+        String judgeConfigStr = question.getJudgeConfig();
+        questionVO.setJudgeConfig(JSONUtil.toBean(judgeConfigStr, JudgeConfig.class));
         return questionVO;
     }
+
+    private static final long serialVersionUID = 1L;
 }

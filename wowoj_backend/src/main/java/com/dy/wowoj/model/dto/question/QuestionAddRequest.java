@@ -26,7 +26,7 @@ public class QuestionAddRequest implements Serializable {
     private String content;
 
     /**
-     * 标签列表（json 数组）
+     * 标签列表
      */
     private List<String> tags;
 
@@ -36,15 +36,14 @@ public class QuestionAddRequest implements Serializable {
     private String answer;
 
     /**
-     * 判题用例(json)
+     * 判题用例
      */
     private List<JudgeCase> judgeCase;
 
     /**
-     * 判题配置(json)
+     * 判题配置
      */
-    private List<JudgeConfig> judgeConfig;
+    private JudgeConfig judgeConfig;
 
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

@@ -20,7 +20,6 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -34,7 +33,7 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
     private String content;
 
     /**
-     * 标签列表（json 数组）
+     * 标签列表
      */
     private List<String> tags;
 
@@ -48,6 +47,5 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
      */
     private Long userId;
 
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
