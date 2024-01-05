@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dy.wowoj.common.ErrorCode;
 import com.dy.wowoj.constant.CommonConstant;
 import com.dy.wowoj.exception.BusinessException;
+import com.dy.wowoj.judge.JudgeService;
 import com.dy.wowoj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.dy.wowoj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.dy.wowoj.model.entity.Question;
@@ -22,10 +23,12 @@ import com.dy.wowoj.service.UserService;
 import com.dy.wowoj.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +41,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private QuestionService questionService;
     @Resource
     private UserService userService;
+    @Resource
+    @Lazy
+    private JudgeService judgeService;
 
     @Override
     public long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
@@ -64,7 +70,13 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if(!res){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"题目提交异常");
         }
-        return questionSubmit.getId();
+        Long questionSubmitId = questionSubmit.getId();
+        // 执行判题服务
+        CompletableFuture.runAsync(() -> {
+            judgeService.doJudge(questionSubmitId);
+        });
+
+        return questionSubmitId;
     }
     /**
      * 获取查询包装类（用户根据哪些字段查询，根据前端传来的请求对象，得到 mybatis 框架支持的查询 QueryWrapper 类）

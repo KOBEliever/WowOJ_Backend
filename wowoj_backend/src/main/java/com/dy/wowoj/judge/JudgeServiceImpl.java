@@ -8,20 +8,24 @@ import com.dy.wowoj.judge.codesandbox.CodeSandboxFactory;
 import com.dy.wowoj.judge.codesandbox.CodeSandboxProxy;
 import com.dy.wowoj.judge.codesandbox.mode.ExecuteCodeRequest;
 import com.dy.wowoj.judge.codesandbox.mode.ExecuteCodeResponse;
+import com.dy.wowoj.judge.strategy.DefaultJudgeStrategy;
+import com.dy.wowoj.judge.strategy.JudgeContext;
+import com.dy.wowoj.judge.strategy.JudgeStrategy;
 import com.dy.wowoj.model.dto.question.JudgeCase;
+import com.dy.wowoj.model.dto.questionsubmit.JudgeInfo;
 import com.dy.wowoj.model.entity.Question;
 import com.dy.wowoj.model.entity.QuestionSubmit;
 import com.dy.wowoj.model.enums.QuestionSubmitStatusEnum;
 import com.dy.wowoj.service.QuestionService;
 import com.dy.wowoj.service.QuestionSubmitService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Service
 public class JudgeServiceImpl implements JudgeService{
 
     @Resource
@@ -32,6 +36,9 @@ public class JudgeServiceImpl implements JudgeService{
 
     @Value("${codesandbox.type:example}")
     private String type;
+
+    @Resource
+    private JudgeManager judgeManager;
 
     @Override
     public QuestionSubmit doJudge(long questionSubmitId) {
@@ -74,16 +81,26 @@ public class JudgeServiceImpl implements JudgeService{
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
         List<String> outputList = executeCodeResponse.getOutputList();
         // 5）根据沙箱的执行结果，设置题目的判题状态和信息
+        JudgeContext judgeContext = new JudgeContext();
+        judgeContext.setJudgeInfo(executeCodeResponse.getJudgeInfo());
+        judgeContext.setInputList(inputList);
+        judgeContext.setOutputList(outputList);
+        judgeContext.setJudgeCaseList(judgeCaseList);
+        judgeContext.setQuestion(question);
+        judgeContext.setQuestionSubmit(questionSubmit);
 
+        JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
         // 6）修改数据库中的判题结果
+        questionSubmitUpdate = new QuestionSubmit();
+        questionSubmitUpdate.setId(questionSubmitId);
+        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
+        questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
+        update = questionSubmitService.updateById(questionSubmitUpdate);
+        if (!update) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "题目状态更新错误");
+        }
+        QuestionSubmit questionSubmitResult = questionSubmitService.getById(questionId);
+        return questionSubmitResult;
 
-        String judgeInfo = questionSubmit.getJudgeInfo();
-        Integer status = questionSubmit.getStatus();
-        Long userId = questionSubmit.getUserId();
-        Date createTime = questionSubmit.getCreateTime();
-        Date updateTime = questionSubmit.getUpdateTime();
-        Integer isDelete = questionSubmit.getIsDelete();
-
-        return null;
     }
 }
